@@ -17,6 +17,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ArticleIcon from "@mui/icons-material/Article";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import { menuItems } from "../../data/menuItems";
+import type { MenuOption } from "../../data/menuItems";
 import { useAuth } from "../../context/AuthContext";
 
 interface SidebarMenuProps {
@@ -212,23 +213,25 @@ const SidebarMenu = ({ openSidebar, onClose }: SidebarMenuProps) => {
         }));
     };
 
-    // Verifica si el rol del usuario tiene permiso
+    // Verifica si el rol del usuario está permitido para una opción.
     const hasRole = (roles: string[]) => {
         return roles.includes(userRole);
     };
 
-    // Filtra el menú según el rol del usuario
+    // Los permisos se validan únicamente por rol.
+    const canShowOption = (option: MenuOption) => {
+        return hasRole(option.roles);
+    };
+
+    // Módulos y submódulos se muestran automáticamente cuando contienen
+    // al menos una opción permitida para el usuario.
     const filteredMenuItems = menuItems
-        .filter((module) => hasRole(module.roles))
         .map((module) => ({
             ...module,
             submodules: module.submodules
-                .filter((submodule) => hasRole(submodule.roles))
                 .map((submodule) => ({
                     ...submodule,
-                    options: submodule.options.filter((option) =>
-                        hasRole(option.roles)
-                    ),
+                    options: submodule.options.filter(canShowOption),
                 }))
                 .filter((submodule) => submodule.options.length > 0),
         }))

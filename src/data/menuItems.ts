@@ -1,21 +1,30 @@
-export const menuItems = [
+export interface MenuOption {
+  label: string;
+  path: string;
+  roles: string[];
+}
+
+export interface MenuSubmodule {
+  name: string;
+  options: MenuOption[];
+}
+
+export interface MenuModule {
+  module: string;
+  submodules: MenuSubmodule[];
+}
+
+export const menuItems: MenuModule[] = [
   {
-    module: "PQR",
-    roles: ["USER"],
+    module: "Préstamos",
     submodules: [
       {
-        name: "Solicitudes",
-        roles: ["USER"],
+        name: "Herramientas",
         options: [
           {
-            label: "Mis PQR",
-            path: "/dashboard/pqrs/my",
-            roles: ["USER"],
-          },
-          {
-            label: "Crear PQR",
-            path: "/dashboard/pqrs/create",
-            roles: ["USER"],
+            label: "Simulador de préstamos",
+            path: "/dashboard/loans/simulator",
+            roles: ["USER", "AGENT", "ADMIN"],
           },
         ],
       },
@@ -23,30 +32,35 @@ export const menuItems = [
   },
 
   {
-    module: "AGENT",
-    roles: ["AGENT"],
+    module: "PQR",
     submodules: [
       {
-        name: "Gestión de PQR",
-        roles: ["AGENT"],
+        name: "Mis solicitudes PQR",
         options: [
           {
-            label: "Lista de PQR",
+            label: "Ver mis PQR",
+            path: "/dashboard/pqrs/my",
+            roles: ["USER", "AGENT"],
+          },
+          {
+            label: "Crear nueva PQR",
+            path: "/dashboard/pqrs/create",
+            roles: ["USER", "AGENT"],
+          },
+        ],
+      },
+      {
+        name: "Atención de solicitudes PQR",
+        options: [
+          {
+            label: "PQR asignadas",
             path: "/agent/pqrs",
             roles: ["AGENT"],
           },
         ],
       },
-    ],
-  },
-
-  {
-    module: "Gestión Administrativa",
-    roles: ["ADMIN"],
-    submodules: [
       {
-        name: "Administrar PQR",
-        roles: ["ADMIN"],
+        name: "Administración de PQR",
         options: [
           {
             label: "Todas las PQR",
@@ -55,31 +69,18 @@ export const menuItems = [
           },
         ],
       },
-      {
-        name: "Usuarios",
-        roles: ["ADMIN"],
-        options: [
-          {
-            label: "Gestionar usuarios",
-            path: "/users",
-            roles: ["ADMIN"],
-          },
-        ],
-      },
     ],
   },
 
   {
-    module: "Créditos",
-    roles: ["ADMIN"],
+    module: "Usuarios",
     submodules: [
       {
-        name: "Gestión de créditos",
-        roles: ["ADMIN"],
+        name: "Gestión de usuarios",
         options: [
           {
-            label: "Simulador de préstamos",
-            path: "/dashboard/credits/simulator",
+            label: "Administrar usuarios",
+            path: "/users",
             roles: ["ADMIN"],
           },
         ],

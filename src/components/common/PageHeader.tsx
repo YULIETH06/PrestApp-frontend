@@ -5,10 +5,16 @@ interface PageHeaderProps {
   title: string;
   subtitle?: string;
   actions?: ReactNode;
+  titleAdornment?: ReactNode;
 }
 
-// Muestra el encabezado reutilizable de una página
-const PageHeader = ({ title, subtitle, actions }: PageHeaderProps) => {
+// Muestra el encabezado reutilizable de una página.
+const PageHeader = ({
+  title,
+  subtitle,
+  actions,
+  titleAdornment,
+}: PageHeaderProps) => {
   return (
     <Box
       sx={{
@@ -24,17 +30,30 @@ const PageHeader = ({ title, subtitle, actions }: PageHeaderProps) => {
         sx={{
           display: "flex",
           flexDirection: "column",
+          minWidth: 0,
         }}
       >
-        <Typography
-          variant="h5"
+        <Box
           sx={{
-            fontWeight: 700,
-            color: "text.primary",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            flexWrap: "wrap",
           }}
         >
-          {title}
-        </Typography>
+          <Typography
+            variant="h5"
+            component="h1"
+            sx={{
+              fontWeight: 700,
+              color: "text.primary",
+            }}
+          >
+            {title}
+          </Typography>
+
+          {titleAdornment}
+        </Box>
 
         {subtitle && (
           <Typography

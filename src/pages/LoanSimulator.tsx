@@ -1,27 +1,32 @@
 import {
     Box,
-    Button,
-    TextField,
 } from "@mui/material";
 
 import CalculateOutlinedIcon from "@mui/icons-material/CalculateOutlined";
-import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
 
 import PageHeader from "../components/common/PageHeader";
-import FormSection from "../components/common/FormSection";
-import FormGrid from "../components/common/FormGrid";
+import ActionButton from "../components/common/ActionButton";
 import ClearableSelect from "../components/common/ClearableSelect";
+import FormGrid from "../components/common/FormGrid";
+import SectionCard from "../components/common/SectionCard";
+
+import MoneyInput from "../components/common/inputs/MoneyInput";
+import NumberInput from "../components/common/inputs/NumberInput";
+
 import LoanSummaryCard from "../components/loans/LoanSummaryCard";
 
-import type { LoanFrequency } from "../interfaces/loans/loan.interface";
+import type {
+    LoanFrequency,
+} from "../interfaces/loans/loan.interface";
 
 import {
     loanFrequencyOptions,
     loanTermFrequencyOptions,
 } from "../data/loanOptions";
 
-import { formatNumberInput } from "../utils/common/numberUtils";
-import { useLoanSimulator } from "../hooks/loans/useLoanSimulator";
+import {
+    useLoanSimulator,
+} from "../hooks/loans/useLoanSimulator";
 
 // Página principal del simulador de préstamos.
 const LoanSimulator = () => {
@@ -39,38 +44,33 @@ const LoanSimulator = () => {
     } = useLoanSimulator();
 
     return (
-        <Box sx={{ width: "100%" }}>
+        <Box
+            sx={{
+                width: "100%",
+            }}
+        >
             <PageHeader
                 title="Simulador de préstamos"
                 subtitle="Calcula el interés, los réditos generados, el total a pagar, el número de cuotas y el valor de cada cuota."
                 actions={
                     <>
-                        <Button
-                            variant="outlined"
-                            startIcon={<RestartAltOutlinedIcon />}
+                        <ActionButton
+                            actionType="clear"
                             onClick={handleClearForm}
                             disabled={!hasFormChanges}
-                            sx={{
-                                borderRadius: "8px",
-                                fontWeight: 700,
-                                textTransform: "none",
-                            }}
                         >
                             Limpiar
-                        </Button>
+                        </ActionButton>
 
-                        <Button
-                            variant="contained"
-                            startIcon={<CalculateOutlinedIcon />}
+                        <ActionButton
+                            actionType="custom"
+                            startIcon={
+                                <CalculateOutlinedIcon />
+                            }
                             onClick={handleSimulate}
-                            sx={{
-                                borderRadius: "8px",
-                                fontWeight: 700,
-                                textTransform: "none",
-                            }}
                         >
                             Calcular préstamo
-                        </Button>
+                        </ActionButton>
                     </>
                 }
             />
@@ -78,12 +78,16 @@ const LoanSimulator = () => {
             <Box
                 sx={{
                     display: "grid",
+
                     gridTemplateColumns: {
                         xs: "1fr",
                         md: "minmax(0, 1fr) 360px",
                     },
+
                     gap: 2,
-                    alignItems: "start",
+
+                    alignItems:
+                        "start",
                 }}
             >
                 <Box
@@ -92,7 +96,9 @@ const LoanSimulator = () => {
                         gap: 2,
                     }}
                 >
-                    <FormSection title="Información del préstamo">
+                    <SectionCard
+                        title="Información del préstamo"
+                    >
                         <FormGrid
                             columns={{
                                 xs: "1fr",
@@ -101,96 +107,144 @@ const LoanSimulator = () => {
                                 lg: "repeat(3, minmax(0, 1fr))",
                             }}
                         >
-                            <TextField
-                                fullWidth
+                            <MoneyInput
                                 label="Monto prestado"
-                                type="text"
                                 required
-                                value={formatNumberInput(form.amount)}
-                                error={Boolean(errors.amount)}
-                                helperText={errors.amount}
-                                onChange={(event) =>
+                                value={
+                                    form.amount
+                                }
+                                error={
+                                    Boolean(
+                                        errors.amount
+                                    )
+                                }
+                                helperText={
+                                    errors.amount
+                                }
+                                onChange={(
+                                    value
+                                ) =>
                                     handleFormattedNumberChange(
                                         "amount",
-                                        event.target.value
+                                        value
                                     )
                                 }
                             />
 
-                            <TextField
-                                fullWidth
+                            <NumberInput
                                 label="% Interés"
-                                type="number"
                                 required
-                                value={form.interestRate}
-                                error={Boolean(errors.interestRate)}
-                                helperText={errors.interestRate}
-                                onChange={(event) =>
+                                value={
+                                    form.interestRate
+                                }
+                                error={
+                                    Boolean(
+                                        errors.interestRate
+                                    )
+                                }
+                                helperText={
+                                    errors.interestRate
+                                }
+                                onChange={(
+                                    value
+                                ) =>
                                     handleNumberChange(
                                         "interestRate",
-                                        event.target.value
+                                        value
                                     )
                                 }
                             />
 
                             <ClearableSelect
                                 label="Frecuencia del interés"
-                                value={form.interestFrequency}
+                                value={
+                                    form.interestFrequency
+                                }
                                 required
                                 clearable
-                                options={loanFrequencyOptions}
-                                error={errors.interestFrequency}
-                                onChange={(value) =>
+                                options={
+                                    loanFrequencyOptions
+                                }
+                                error={
+                                    errors.interestFrequency
+                                }
+                                onChange={(
+                                    value
+                                ) =>
                                     handleChange(
                                         "interestFrequency",
-                                        value as LoanFrequency | ""
+                                        value as
+                                        | LoanFrequency
+                                        | ""
                                     )
                                 }
                             />
                         </FormGrid>
-                    </FormSection>
+                    </SectionCard>
 
-                    <FormSection title="Plazo del préstamo">
+                    <SectionCard
+                        title="Plazo del préstamo"
+                    >
                         <FormGrid
                             columns={{
                                 xs: "1fr",
                                 md: "repeat(2, minmax(0, 1fr))",
                             }}
                         >
-                            <TextField
-                                fullWidth
+                            <NumberInput
                                 label="Plazo"
-                                type="number"
                                 required
-                                value={form.termValue}
-                                error={Boolean(errors.termValue)}
-                                helperText={errors.termValue}
-                                onChange={(event) =>
+                                value={
+                                    form.termValue
+                                }
+                                error={
+                                    Boolean(
+                                        errors.termValue
+                                    )
+                                }
+                                helperText={
+                                    errors.termValue
+                                }
+                                onChange={(
+                                    value
+                                ) =>
                                     handleNumberChange(
                                         "termValue",
-                                        event.target.value
+                                        value
                                     )
                                 }
                             />
 
                             <ClearableSelect
                                 label="Unidad del plazo"
-                                value={form.termFrequency}
+                                value={
+                                    form.termFrequency
+                                }
                                 required
                                 clearable
-                                options={loanTermFrequencyOptions}
-                                error={errors.termFrequency}
-                                onChange={(value) =>
+                                options={
+                                    loanTermFrequencyOptions
+                                }
+                                error={
+                                    errors.termFrequency
+                                }
+                                onChange={(
+                                    value
+                                ) =>
                                     handleChange(
                                         "termFrequency",
-                                        value as LoanFrequency | ""
+                                        value as
+                                        | LoanFrequency
+                                        | ""
                                     )
                                 }
                             />
                         </FormGrid>
-                    </FormSection>
+                    </SectionCard>
 
-                    <FormSection title="Modalidad de pago">
+                    <SectionCard
+                        title="Modalidad de pago"
+                    >
                         <FormGrid
                             columns={{
                                 xs: "1fr",
@@ -199,20 +253,30 @@ const LoanSimulator = () => {
                         >
                             <ClearableSelect
                                 label="Frecuencia de pago"
-                                value={form.paymentFrequency}
+                                value={
+                                    form.paymentFrequency
+                                }
                                 required
                                 clearable
-                                options={loanFrequencyOptions}
-                                error={errors.paymentFrequency}
-                                onChange={(value) =>
+                                options={
+                                    loanFrequencyOptions
+                                }
+                                error={
+                                    errors.paymentFrequency
+                                }
+                                onChange={(
+                                    value
+                                ) =>
                                     handleChange(
                                         "paymentFrequency",
-                                        value as LoanFrequency | ""
+                                        value as
+                                        | LoanFrequency
+                                        | ""
                                     )
                                 }
                             />
                         </FormGrid>
-                    </FormSection>
+                    </SectionCard>
                 </Box>
 
                 <Box
@@ -221,12 +285,15 @@ const LoanSimulator = () => {
                             xs: "static",
                             lg: "sticky",
                         },
+
                         top: {
                             lg: 16,
                         },
                     }}
                 >
-                    <LoanSummaryCard result={result} />
+                    <LoanSummaryCard
+                        result={result}
+                    />
                 </Box>
             </Box>
         </Box>

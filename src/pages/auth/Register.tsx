@@ -1,41 +1,52 @@
 import {
   Alert,
   Box,
-  Button,
-  CircularProgress,
   Link,
-  TextField,
   Typography,
 } from "@mui/material";
+
 import { useTheme } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 
-import { useLogin } from "../hooks/auth/useLogin";
-import { appBrand } from "../data/appBrand";
+import TextInput from "../../components/common/inputs/TextInput";
+import PasswordInput from "../../components/common/inputs/PasswordInput";
+import ActionButton from "../../components/common/ActionButton";
+import CustomSnackbar from "../../components/common/CustomSnackbar";
 
-const Login = () => {
+import { appBrand } from "../../data/appBrand";
+import { useRegister } from "../../hooks/auth/useRegister";
+
+const Register = () => {
   const navigate = useNavigate();
   const theme = useTheme();
 
   const {
+    name,
     email,
     password,
     loading,
 
+    message,
+    openMessage,
     error,
     formErrors,
 
+    handleNameChange,
     handleEmailChange,
     handlePasswordChange,
-    handleLogin,
-  } = useLogin();
+    handleRegister,
+    closeMessage,
+  } = useRegister();
 
   const style = {
     container: {
       minHeight: "100vh",
+
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+
+      p: 2,
 
       background: `linear-gradient(
         135deg,
@@ -45,8 +56,9 @@ const Login = () => {
     },
 
     form: {
-      width: "420px",
-      minHeight: "430px",
+      width: "100%",
+      maxWidth: "420px",
+      minHeight: "480px",
 
       display: "flex",
       flexDirection: "column",
@@ -54,7 +66,7 @@ const Login = () => {
 
       backgroundColor: theme.palette.background.paper,
 
-      padding: "2rem",
+      p: "2rem",
       borderRadius: "12px",
       gap: "16px",
 
@@ -65,44 +77,25 @@ const Login = () => {
       width: "160px",
       height: "auto",
       objectFit: "contain",
-      marginBottom: "0.5rem",
-    },
-
-    input: {
-      width: "100%",
-    },
-
-    button: {
-      width: "100%",
-      height: "45px",
-
-      textTransform: "none",
-
-      backgroundColor: theme.palette.primary.main,
-
-      fontWeight: 600,
-
-      "&:hover": {
-        backgroundColor: theme.palette.primary.dark,
-      },
+      mb: "0.5rem",
     },
 
     link: {
-      marginTop: "0.5rem",
-
       cursor: "pointer",
-
       textDecoration: "none",
-
       color: theme.palette.primary.main,
-
       fontWeight: 500,
     },
   };
 
   return (
     <Box sx={style.container}>
-      <Box component="form" onSubmit={handleLogin} sx={style.form} noValidate>
+      <Box
+        component="form"
+        onSubmit={handleRegister}
+        sx={style.form}
+        noValidate
+      >
         <Box
           component="img"
           src={appBrand.logo}
@@ -117,54 +110,66 @@ const Login = () => {
             fontSize: "1rem",
           }}
         >
-          Bienvenido a tu plataforma de gestión
+          Regístrate para acceder a App-INC
         </Typography>
 
+        {/* Mensaje para errores generales del backend. */}
         {error && (
-          <Alert severity="error" sx={{ width: "100%", borderRadius: 2 }}>
+          <Alert
+            severity="error"
+            sx={{
+              width: "100%",
+              borderRadius: 2,
+            }}
+          >
             {error}
           </Alert>
         )}
 
-        <TextField
+        <TextInput
+          label="Nombre completo"
+          value={name}
+          onChange={handleNameChange}
+          required
+          disabled={loading}
+          error={Boolean(formErrors.name)}
+          helperText={formErrors.name}
+          autoComplete="name"
+        />
+
+        <TextInput
           label="Correo electrónico"
           value={email}
-          onChange={(event) => handleEmailChange(event.target.value)}
-          sx={style.input}
-          fullWidth
+          onChange={handleEmailChange}
           required
           disabled={loading}
-          error={!!formErrors.email}
+          error={Boolean(formErrors.email)}
           helperText={formErrors.email}
+          autoComplete="email"
         />
 
-        <TextField
+        <PasswordInput
           label="Contraseña"
-          type="password"
           value={password}
-          onChange={(event) => handlePasswordChange(event.target.value)}
-          sx={style.input}
-          fullWidth
+          onChange={handlePasswordChange}
           required
           disabled={loading}
-          error={!!formErrors.password}
+          error={Boolean(formErrors.password)}
           helperText={formErrors.password}
+          hint="Mínimo 6 caracteres."
+          autoComplete="new-password"
         />
 
-        <Button
+        <ActionButton
+          actionType="custom"
           type="submit"
-          variant="contained"
-          sx={style.button}
-          disabled={loading}
+          loading={loading}
+          loadingText="Registrando..."
+          size="large"
+          fullWidth
         >
-          {loading ? (
-            <CircularProgress size={24} color="inherit" />
-          ) : (
-            "Iniciar sesión"
-          )}
-        </Button>
-
-        <Link sx={style.link}>¿Olvidaste tu contraseña?</Link>
+          Registrarse
+        </ActionButton>
 
         <Typography
           sx={{
@@ -172,19 +177,29 @@ const Login = () => {
             color: theme.palette.text.secondary,
           }}
         >
-          ¿No tienes una cuenta?{" "}
+          ¿Ya tienes cuenta?{" "}
+
           <Link
-            onClick={() => {
-              if (!loading) navigate("/register");
-            }}
             sx={style.link}
+            onClick={() => {
+              if (!loading) {
+                navigate("/");
+              }
+            }}
           >
-            Regístrate aquí
+            Inicia sesión
           </Link>
         </Typography>
       </Box>
+
+      <CustomSnackbar
+        open={openMessage}
+        message={message}
+        severity="success"
+        onClose={closeMessage}
+      />
     </Box>
   );
 };
 
-export default Login;
+export default Register;

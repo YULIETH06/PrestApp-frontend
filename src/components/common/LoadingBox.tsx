@@ -1,17 +1,30 @@
-import { Box, CircularProgress } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+} from "@mui/material";
 
-// Muestra un indicador de carga centrado
-const LoadingBox = () => {
+interface LoadingBoxProps {
+  minHeight?: number | string;
+  size?: number;
+}
+
+// Muestra un indicador de carga centrado.
+const LoadingBox = ({
+  minHeight = 300,
+  size,
+}: LoadingBoxProps) => {
   return (
     <Box
       sx={{
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "300px",
+        minHeight,
       }}
     >
-      <CircularProgress />
+      <CircularProgress
+        size={size}
+      />
     </Box>
   );
 };

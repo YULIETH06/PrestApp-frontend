@@ -1,4 +1,8 @@
-import { useEffect, useRef } from "react";
+import {
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 import {
     Alert,
     Avatar,
@@ -24,7 +28,8 @@ import AttachFileOutlinedIcon from "@mui/icons-material/AttachFileOutlined";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 
-import type { Pqr, PqrMessage, UserRole } from "../../interfaces/pqrs/pqr.interface";
+import type { Pqr, PqrMessage } from "../../interfaces/pqrs/pqr.interface";
+import type { UserRole } from "../../interfaces/users/user.interface";
 import {
     getCaseTypeLabel,
     getStatusColor,
@@ -32,8 +37,12 @@ import {
 import { pqrStatusOptions } from "../../data/pqrOptions";
 import { getInitials } from "../../utils/common/avatarUtils";
 import { formatDate } from "../../utils/common/dateUtils";
+import { buildFileUrl } from "../../utils/common/fileUrl";
+import { downloadFile } from "../../utils/common/fileUtils";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import IconActionButton from "../common/IconActionButton";
+
+import PqrAttachmentPreviewDialog from "./PqrAttachmentPreviewDialog";
 
 interface PqrChatViewProps {
     pqr: Pqr;
@@ -71,6 +80,14 @@ export const PqrChatView = ({
 }: PqrChatViewProps) => {
     const theme = useTheme();
 
+    const [
+        previewImage,
+        setPreviewImage,
+    ] = useState<{
+        url: string;
+        name: string;
+    } | null>(null);
+
     // Referencia al input oculto para seleccionar archivos.
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -98,11 +115,6 @@ export const PqrChatView = ({
         onSelectFile(file);
 
         event.target.value = "";
-    };
-
-    // Construye la URL completa del archivo.
-    const getAttachmentUrl = (fileUrl: string) => {
-        return `${BACKEND_URL}${fileUrl}`;
     };
 
     // Baja automáticamente al último mensaje cuando cambia el historial del chat.
@@ -360,13 +372,44 @@ export const PqrChatView = ({
             whiteSpace: "pre-wrap",
         },
 
+        attachmentImageWrapper: {
+            position: "relative",
+            display: "inline-block",
+            maxWidth: "240px",
+            width: "100%",
+            mt: 1,
+        },
+
         attachmentImage: {
             display: "block",
             maxWidth: "240px",
             width: "100%",
             borderRadius: "12px",
-            mt: 1,
-            border: `1px solid ${alpha(theme.palette.common.black, 0.12)}`,
+            border: `1px solid ${alpha(
+                theme.palette.common.black,
+                0.12
+            )}`,
+            cursor: "pointer",
+        },
+
+        attachmentDownloadBtn: {
+            position: "absolute",
+            right: 8,
+            bottom: 8,
+            width: 30,
+            height: 30,
+            color: theme.palette.common.white,
+            backgroundColor: alpha(
+                theme.palette.common.black,
+                0.55
+            ),
+
+            "&:hover": {
+                backgroundColor: alpha(
+                    theme.palette.common.black,
+                    0.72
+                ),
+            },
         },
 
         attachmentFile: {
@@ -695,7 +738,7 @@ export const PqrChatView = ({
                                                 {msg.attachments?.map(
                                                     (attachment) => {
                                                         const attachmentUrl =
-                                                            getAttachmentUrl(
+                                                            buildFileUrl(
                                                                 attachment.fileUrl
                                                             );
 
@@ -708,17 +751,43 @@ export const PqrChatView = ({
                                                                     key={
                                                                         attachment.id
                                                                     }
-                                                                    component="img"
-                                                                    src={
-                                                                        attachmentUrl
-                                                                    }
-                                                                    alt={
-                                                                        attachment.originalName
-                                                                    }
                                                                     sx={
-                                                                        style.attachmentImage
+                                                                        style.attachmentImageWrapper
                                                                     }
-                                                                />
+                                                                >
+                                                                    <Box
+                                                                        component="img"
+                                                                        src={
+                                                                            attachmentUrl
+                                                                        }
+                                                                        alt={
+                                                                            attachment.originalName
+                                                                        }
+                                                                        onClick={() =>
+                                                                            setPreviewImage({
+                                                                                url: attachmentUrl,
+                                                                                name: attachment.originalName,
+                                                                            })
+                                                                        }
+                                                                        sx={
+                                                                            style.attachmentImage
+                                                                        }
+                                                                    />
+
+                                                                    <IconActionButton
+                                                                        icon="download"
+                                                                        tooltip="Descargar imagen"
+                                                                        onClick={() =>
+                                                                            void downloadFile(
+                                                                                attachmentUrl,
+                                                                                attachment.originalName
+                                                                            )
+                                                                        }
+                                                                        sx={
+                                                                            style.attachmentDownloadBtn
+                                                                        }
+                                                                    />
+                                                                </Box>
                                                             );
                                                         }
 
@@ -884,6 +953,23 @@ export const PqrChatView = ({
                     </>
                 )}
             </Paper>
+
+            <PqrAttachmentPreviewDialog
+                open={Boolean(previewImage)}
+                image={previewImage}
+                onClose={() => setPreviewImage(null)}
+                onDownload={() => {
+                    if (!previewImage) {
+                        return;
+                    }
+
+                    void downloadFile(
+                        previewImage.url,
+                        previewImage.name
+                    );
+                }}
+            />
+
         </Box>
     );
 };
