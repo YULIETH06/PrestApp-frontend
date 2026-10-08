@@ -1,3 +1,5 @@
+import type { UserRole } from "../users/user.interface";
+
 // Datos necesarios para iniciar sesión.
 export interface LoginData {
     email: string;
@@ -9,7 +11,7 @@ export interface AuthUser {
     id: number;
     name: string;
     email: string;
-    role: "ADMIN" | "USER" | "AGENT";
+    role: UserRole;
 }
 
 // Respuesta del login.

@@ -23,19 +23,6 @@ export const getAllUsers = async (): Promise<{
   return response.data;
 };
 
-// Obtiene únicamente los usuarios que tienen rol AGENT. Endpoint usado por ADMIN.
-export const getAgents = async (): Promise<{
-  message: string;
-  agents: User[];
-}> => {
-  const response = await api.get<{
-    message: string;
-    agents: User[];
-  }>("/users/agents");
-
-  return response.data;
-};
-
 // Actualiza el rol de un usuario. Endpoint usado por ADMIN.
 export const updateUserRole = async (
   userId: number,

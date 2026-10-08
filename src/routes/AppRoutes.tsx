@@ -13,11 +13,6 @@ import PublicRoute from "./PublicRoute";
 
 import DashboardLayout from "../components/layouts/DashboardLayout";
 
-import CreatePqr from "../pages/pqrs/user/CreatePqr";
-import MyPqrs from "../pages/pqrs/user/MyPqrs";
-import AdminPqrs from "../pages/pqrs/admin/AdminPqrs";
-import AgentPqrs from "../pages/pqrs/agent/AgentPqrs";
-
 import AdminUsers from "../pages/users/AdminUsers";
 import ChangePassword from "../pages/users/ChangePassword";
 
@@ -49,27 +44,6 @@ const AppRoutes = () => {
           <Route
             path="/dashboard/loans/simulator"
             element={<LoanSimulator />}
-          />
-
-          {/* PQR */}
-          <Route
-            path="/dashboard/pqrs/my"
-            element={<MyPqrs />}
-          />
-
-          <Route
-            path="/dashboard/pqrs/create"
-            element={<CreatePqr />}
-          />
-
-          <Route
-            path="/dashboard/pqrs"
-            element={<AdminPqrs />}
-          />
-
-          <Route
-            path="/agent/pqrs"
-            element={<AgentPqrs />}
           />
 
           {/* Usuarios */}
