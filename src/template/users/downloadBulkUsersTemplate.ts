@@ -76,7 +76,7 @@ export const downloadBulkUsersTemplate = async () => {
     "Regla: escriba una contraseña para el usuario. Debe tener mínimo 6 caracteres.";
 
   worksheet.getCell("D1").note =
-    "Regla: seleccione un rol válido. Opciones permitidas: USER, ADMIN o AGENT.";
+    "Regla: seleccione un rol válido. Opciones permitidas: USER o ADMIN.";
 
   // Lista desplegable para rol sin asignar valores vacíos a las filas.
   const worksheetWithValidation = worksheet as WorksheetWithDataValidations;
@@ -84,10 +84,10 @@ export const downloadBulkUsersTemplate = async () => {
   worksheetWithValidation.dataValidations.add("D2:D500", {
     type: "list",
     allowBlank: true,
-    formulae: ['"USER,ADMIN,AGENT"'],
+    formulae: ['"USER,ADMIN"'],
     showErrorMessage: true,
     errorTitle: "Rol no válido",
-    error: "Debe seleccionar un rol válido: USER, ADMIN o AGENT.",
+    error: "Debe seleccionar un rol válido: USER o ADMIN.",
   });
 
   worksheet.views = [

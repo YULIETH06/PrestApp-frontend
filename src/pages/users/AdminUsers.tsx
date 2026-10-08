@@ -1,0 +1,618 @@
+import {
+  useMemo,
+  useState,
+} from "react";
+
+import {
+  Alert,
+  Box,
+  Typography,
+  useTheme,
+} from "@mui/material";
+
+import type {
+  DataTableColumn,
+} from "../../components/common/DataTable";
+
+import type {
+  User,
+  UserRole,
+} from "../../interfaces/users/user.interface";
+
+import {
+  useAdminUsers,
+} from "../../hooks/users/useAdminUsers";
+
+import {
+  useChangeUserPassword,
+} from "../../hooks/users/useChangeUserPassword";
+
+import {
+  userRoles,
+} from "../../data/userRoles";
+
+import {
+  getUserRoleLabel,
+} from "../../utils/users/userRoleUtils";
+
+import LoadingBox from "../../components/common/LoadingBox";
+import EmptyState from "../../components/common/EmptyState";
+import CustomSnackbar from "../../components/common/CustomSnackbar";
+import DataTable from "../../components/common/DataTable";
+import ListToolbar from "../../components/common/ListToolbar";
+import IconActionButton from "../../components/common/IconActionButton";
+import ActionButton from "../../components/common/ActionButton";
+import BulkUploadDialog from "../../components/common/BulkUploadDialog";
+import ClearableSelect from "../../components/common/ClearableSelect";
+
+import UserRoleChip from "../../components/users/UserRoleChip";
+import ChangeUserRoleDialog from "../../components/users/ChangeUserRoleDialog";
+import ChangeUserPasswordDialog from "../../components/users/ChangeUserPasswordDialog";
+
+import {
+  filterStyles,
+} from "../../styles/filterStyles";
+
+import {
+  getTableStyles,
+} from "../../styles/tableStyles";
+
+import {
+  downloadBulkUsersTemplate,
+} from "../../template/users/downloadBulkUsersTemplate";
+
+// Página principal para administrar usuarios.
+const AdminUsers = () => {
+  const theme = useTheme();
+
+  const tableStyles =
+    getTableStyles(theme);
+
+  // Administración general de usuarios.
+  const {
+    users,
+    loading,
+    error,
+    updatingUserId,
+
+    selectedUser,
+    selectedRole,
+    openDialog,
+
+    message,
+    messageType,
+    openMessage,
+
+    openBulkUploadDialog,
+    bulkUploadFile,
+    bulkUploadLoading,
+    bulkUploadResult,
+
+    loadUsers,
+
+    openChangeRoleDialog,
+    closeChangeRoleDialog,
+    changeSelectedRole,
+    updateRole,
+
+    openBulkUpload,
+    closeBulkUpload,
+    changeBulkUploadFile,
+    uploadBulkUsers,
+    clearBulkUploadResult,
+    bulkUploadCompleted,
+
+    closeMessage,
+  } = useAdminUsers();
+
+  // Restablecimiento administrativo de contraseña.
+  const {
+    selectedPasswordUser,
+
+    openPasswordDialog,
+
+    newPassword,
+    confirmPassword,
+
+    loading: passwordLoading,
+    formErrors: passwordFormErrors,
+
+    message: passwordMessage,
+    messageType: passwordMessageType,
+    openMessage: openPasswordMessage,
+
+    openChangePasswordDialog,
+    closeChangePasswordDialog,
+
+    handleNewPasswordChange,
+    handleConfirmPasswordChange,
+    handleChangePassword,
+
+    closeMessage: closePasswordMessage,
+  } = useChangeUserPassword();
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [
+    roleFilter,
+    setRoleFilter,
+  ] = useState<
+    "ALL" | UserRole
+  >("ALL");
+
+  // Opciones disponibles para filtrar usuarios por rol.
+  const roleFilterOptions = [
+    {
+      label: "Todos los roles",
+      value: "ALL",
+    },
+    ...userRoles.map(
+      (role) => ({
+        label:
+          getUserRoleLabel(
+            role
+          ),
+        value: role,
+      })
+    ),
+  ];
+
+  // Cambia la página actual de la tabla.
+  const handleChangePage = (
+    _event: unknown,
+    newPage: number
+  ) => {
+    setPage(newPage);
+  };
+
+  // Cambia la cantidad de registros visibles por página.
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(
+      Number(
+        event.target.value
+      )
+    );
+
+    setPage(0);
+  };
+
+  // Actualiza la búsqueda y regresa a la primera página.
+  const handleSearchChange = (
+    value: string
+  ) => {
+    setSearchTerm(value);
+    setPage(0);
+  };
+
+  // Actualiza el filtro por rol.
+  const handleRoleFilterChange = (
+    value: string
+  ) => {
+    setRoleFilter(
+      value as
+      | "ALL"
+      | UserRole
+    );
+
+    setPage(0);
+  };
+
+  // Limpia el filtro por rol.
+  const clearRoleFilter = () => {
+    setRoleFilter("ALL");
+    setPage(0);
+  };
+
+  // Filtra usuarios por nombre, correo y rol.
+  const filteredUsers =
+    useMemo(() => {
+      const normalizedSearch =
+        searchTerm
+          .toLowerCase()
+          .trim();
+
+      return users.filter(
+        (user) => {
+          const matchesSearch =
+            user.name
+              .toLowerCase()
+              .includes(
+                normalizedSearch
+              ) ||
+            user.email
+              .toLowerCase()
+              .includes(
+                normalizedSearch
+              );
+
+          const matchesRole =
+            roleFilter === "ALL" ||
+            user.role ===
+            roleFilter;
+
+          return (
+            matchesSearch &&
+            matchesRole
+          );
+        }
+      );
+    }, [
+      users,
+      searchTerm,
+      roleFilter,
+    ]);
+
+  // Define las columnas de la tabla de usuarios.
+  const columns:
+    DataTableColumn<User>[] = [
+      {
+        id: "number",
+        label: "#",
+        render: (
+          _user,
+          index
+        ) => (
+          <Typography
+            sx={
+              tableStyles.rowNumber
+            }
+          >
+            {index + 1}
+          </Typography>
+        ),
+      },
+      {
+        id: "name",
+        label: "Nombre",
+        render: (user) => (
+          <Typography
+            sx={{
+              fontWeight: 700,
+              color:
+                "text.primary",
+            }}
+          >
+            {user.name}
+          </Typography>
+        ),
+      },
+      {
+        id: "email",
+        label: "Correo",
+        render: (user) =>
+          user.email,
+      },
+      {
+        id: "role",
+        label: "Rol",
+        render: (user) => (
+          <UserRoleChip
+            role={user.role}
+          />
+        ),
+      },
+      {
+        id: "action",
+        label: "Acciones",
+        align: "center",
+        render: (user) => (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent:
+                "center",
+              alignItems:
+                "center",
+              gap: 0.5,
+            }}
+          >
+            {/* Cambio de rol. */}
+            <IconActionButton
+              icon="edit"
+              tooltip="Cambiar rol"
+              loading={
+                updatingUserId ===
+                user.id
+              }
+              onClick={() =>
+                openChangeRoleDialog(
+                  user
+                )
+              }
+              sx={
+                tableStyles.primaryActionButton
+              }
+            />
+
+            {/* Restablecimiento de contraseña. */}
+            <IconActionButton
+              icon="changePassword"
+              tooltip="Restablecer contraseña"
+              onClick={() =>
+                openChangePasswordDialog(
+                  user
+                )
+              }
+              disabled={
+                updatingUserId ===
+                user.id
+              }
+              sx={
+                tableStyles.neutralActionButton
+              }
+            />
+          </Box>
+        ),
+      },
+    ];
+
+  if (loading) {
+    return <LoadingBox />;
+  }
+
+  return (
+    <Box
+      sx={{
+        width: "100%",
+        minHeight: "100%",
+      }}
+    >
+      {error && (
+        <Alert
+          severity="error"
+          sx={{
+            marginBottom:
+              "16px",
+          }}
+        >
+          {error}
+        </Alert>
+      )}
+
+      {users.length === 0 ? (
+        <EmptyState
+          title="No hay usuarios registrados"
+          description="Cuando existan usuarios en el sistema, aparecerán en esta tabla."
+        />
+      ) : (
+        <DataTable
+          title="Usuarios registrados"
+          subtitle="Administra los usuarios registrados y sus roles dentro del sistema."
+          actions={
+            <ListToolbar
+              searchValue={
+                searchTerm
+              }
+              onSearchChange={
+                handleSearchChange
+              }
+              searchPlaceholder="Buscar nombre o correo"
+              searchTooltip="Buscar usuario"
+              filterActive={
+                roleFilter !==
+                "ALL"
+              }
+              filterTitle="Filtrar por rol"
+              filterTooltip="Filtrar por rol"
+              filterContent={
+                <Box
+                  sx={
+                    filterStyles.filterMenuContent
+                  }
+                >
+                  <ClearableSelect
+                    label="Rol"
+                    value={
+                      roleFilter
+                    }
+                    options={
+                      roleFilterOptions
+                    }
+                    onChange={
+                      handleRoleFilterChange
+                    }
+                    size="small"
+                    minWidth="100%"
+                  />
+
+                  <ActionButton
+                    actionType="clear"
+                    fullWidth
+                    variant="text"
+                    onClick={
+                      clearRoleFilter
+                    }
+                    disabled={
+                      roleFilter ===
+                      "ALL"
+                    }
+                    sx={
+                      filterStyles.clearFilterButton
+                    }
+                  >
+                    Limpiar filtro
+                  </ActionButton>
+                </Box>
+              }
+              onRefresh={() =>
+                loadUsers()
+              }
+              actions={
+                <IconActionButton
+                  icon="upload"
+                  tooltip="Carga masiva de usuarios"
+                  onClick={
+                    openBulkUpload
+                  }
+                  disabled={
+                    bulkUploadLoading
+                  }
+                />
+              }
+            />
+          }
+          columns={columns}
+          rows={filteredUsers}
+          page={page}
+          rowsPerPage={
+            rowsPerPage
+          }
+          onPageChange={
+            handleChangePage
+          }
+          onRowsPerPageChange={
+            handleChangeRowsPerPage
+          }
+        />
+      )}
+
+      {users.length > 0 &&
+        filteredUsers.length ===
+        0 && (
+          <Box
+            sx={{
+              marginTop:
+                "16px",
+            }}
+          >
+            <EmptyState
+              title="No se encontraron usuarios"
+              description="Intenta buscar con otro nombre, correo o rol."
+            />
+          </Box>
+        )}
+
+      {/* Cambio de rol. */}
+      <ChangeUserRoleDialog
+        open={openDialog}
+        selectedUser={
+          selectedUser
+        }
+        selectedRole={
+          selectedRole
+        }
+        updatingUserId={
+          updatingUserId
+        }
+        onClose={
+          closeChangeRoleDialog
+        }
+        onRoleChange={
+          changeSelectedRole
+        }
+        onSave={updateRole}
+      />
+
+      {/* Restablecimiento de contraseña. */}
+      <ChangeUserPasswordDialog
+        open={
+          openPasswordDialog
+        }
+        selectedUser={
+          selectedPasswordUser
+        }
+        newPassword={
+          newPassword
+        }
+        confirmPassword={
+          confirmPassword
+        }
+        errors={
+          passwordFormErrors
+        }
+        loading={
+          passwordLoading
+        }
+        onClose={
+          closeChangePasswordDialog
+        }
+        onNewPasswordChange={
+          handleNewPasswordChange
+        }
+        onConfirmPasswordChange={
+          handleConfirmPasswordChange
+        }
+        onSave={
+          handleChangePassword
+        }
+      />
+
+      {/* Carga masiva. */}
+      <BulkUploadDialog
+        open={
+          openBulkUploadDialog
+        }
+        title="Carga masiva de usuarios"
+        description="Sube un archivo Excel con los usuarios que deseas registrar en el sistema."
+        requiredColumns={[
+          "nombre",
+          "correo",
+          "contraseña",
+          "rol",
+        ]}
+        file={
+          bulkUploadFile
+        }
+        loading={
+          bulkUploadLoading
+        }
+        completed={
+          bulkUploadCompleted
+        }
+        result={
+          bulkUploadResult
+        }
+        onClose={
+          closeBulkUpload
+        }
+        onFileChange={
+          changeBulkUploadFile
+        }
+        onUpload={
+          uploadBulkUsers
+        }
+        onClearResult={
+          clearBulkUploadResult
+        }
+        onDownloadTemplate={
+          downloadBulkUsersTemplate
+        }
+      />
+
+      {/* Mensajes de administración general. */}
+      <CustomSnackbar
+        open={openMessage}
+        message={message}
+        severity={
+          messageType
+        }
+        onClose={
+          closeMessage
+        }
+      />
+
+      {/* Mensajes del restablecimiento de contraseña. */}
+      <CustomSnackbar
+        open={
+          openPasswordMessage
+        }
+        message={
+          passwordMessage
+        }
+        severity={
+          passwordMessageType
+        }
+        onClose={
+          closePasswordMessage
+        }
+      />
+    </Box>
+  );
+};
+
+export default AdminUsers;

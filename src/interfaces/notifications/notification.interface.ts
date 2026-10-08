@@ -1,10 +1,5 @@
 // Tipos de notificaciones permitidas en el sistema.
-export type NotificationType =
-    | "NEW_PQR"
-    | "STATUS_CHANGE"
-    | "PQR_CLOSED"
-    | "PQR_RATED"
-    | "PQR_TAKEN";
+export type NotificationType = "GENERAL";
 
 // Estructura principal de una notificación.
 export interface Notification {

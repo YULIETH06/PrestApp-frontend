@@ -1,85 +1,45 @@
-export const menuItems = [
-  {
-    module: "PQR",
-    roles: ["USER"],
-    submodules: [
-      {
-        name: "Solicitudes",
-        roles: ["USER"],
-        options: [
-          {
-            label: "Mis PQR",
-            path: "/dashboard/pqrs/my",
-            roles: ["USER"],
-          },
-          {
-            label: "Crear PQR",
-            path: "/dashboard/pqrs/create",
-            roles: ["USER"],
-          },
-        ],
-      },
-    ],
-  },
+export interface MenuOption {
+  label: string;
+  path: string;
+  roles: string[];
+}
 
-  {
-    module: "AGENT",
-    roles: ["AGENT"],
-    submodules: [
-      {
-        name: "Gestión de PQR",
-        roles: ["AGENT"],
-        options: [
-          {
-            label: "Lista de PQR",
-            path: "/agent/pqrs",
-            roles: ["AGENT"],
-          },
-        ],
-      },
-    ],
-  },
+export interface MenuSubmodule {
+  name: string;
+  options: MenuOption[];
+}
 
-  {
-    module: "Gestión Administrativa",
-    roles: ["ADMIN"],
-    submodules: [
-      {
-        name: "Administrar PQR",
-        roles: ["ADMIN"],
-        options: [
-          {
-            label: "Todas las PQR",
-            path: "/dashboard/pqrs",
-            roles: ["ADMIN"],
-          },
-        ],
-      },
-      {
-        name: "Usuarios",
-        roles: ["ADMIN"],
-        options: [
-          {
-            label: "Gestionar usuarios",
-            path: "/users",
-            roles: ["ADMIN"],
-          },
-        ],
-      },
-    ],
-  },
+export interface MenuModule {
+  module: string;
+  submodules: MenuSubmodule[];
+}
 
+export const menuItems: MenuModule[] = [
   {
-    module: "Créditos",
-    roles: ["ADMIN"],
+    module: "Préstamos",
     submodules: [
       {
-        name: "Gestión de créditos",
-        roles: ["ADMIN"],
+        name: "Herramientas",
         options: [
           {
             label: "Simulador de préstamos",
-            path: "/dashboard/credits/simulator",
+            path: "/dashboard/loans/simulator",
+            roles: ["USER", "ADMIN"],
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    module: "Usuarios",
+    submodules: [
+      {
+        name: "Gestión de usuarios",
+        options: [
+          {
+            label: "Administrar usuarios",
+            path: "/users",
             roles: ["ADMIN"],
           },
         ],

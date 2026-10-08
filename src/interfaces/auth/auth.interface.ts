@@ -1,13 +1,29 @@
+import type { UserRole } from "../users/user.interface";
+
 // Datos necesarios para iniciar sesión.
 export interface LoginData {
     email: string;
     password: string;
 }
 
+// Usuario autenticado en la aplicación.
+export interface AuthUser {
+    id: number;
+    name: string;
+    email: string;
+    role: UserRole;
+}
+
 // Respuesta del login.
 export interface LoginResponse {
     message: string;
     token: string;
+    user: AuthUser;
+}
+
+// Respuesta del perfil.
+export interface ProfileResponse {
+    user: AuthUser;
 }
 
 // Datos necesarios para registrar un usuario.
@@ -33,4 +49,22 @@ export interface RegisterFormErrors {
     name: string;
     email: string;
     password: string;
+}
+
+// Datos necesarios para cambiar la contraseña.
+export interface ChangePasswordData {
+    currentPassword: string;
+    newPassword: string;
+}
+
+// Respuesta del cambio de contraseña.
+export interface ChangePasswordResponse {
+    message: string;
+}
+
+// Errores de validación YUP del formulario de cambio de contraseña.
+export interface ChangePasswordFormErrors {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
 }
