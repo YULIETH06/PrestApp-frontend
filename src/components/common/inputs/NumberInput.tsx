@@ -13,6 +13,7 @@ import type {
 } from "@mui/material";
 
 import {
+    cleanDecimalInput,
     cleanNumberInput,
 } from "../../../utils/common/numberUtils";
 
@@ -23,6 +24,7 @@ type NumberInputProps = Omit<
     value: string | number;
     onChange: (value: string) => void;
     hint?: ReactNode;
+    decimal?: boolean;
 };
 
 // Campo reutilizable para valores numéricos enteros.
@@ -30,6 +32,7 @@ const NumberInput = ({
     value,
     onChange,
     hint,
+    decimal = false,
     error,
     helperText,
     disabled,
@@ -40,9 +43,9 @@ const NumberInput = ({
         event: React.ChangeEvent<HTMLInputElement>
     ) => {
         onChange(
-            cleanNumberInput(
-                event.target.value
-            )
+            decimal
+                ? cleanDecimalInput(event.target.value)
+                : cleanNumberInput(event.target.value)
         );
     };
 
@@ -62,10 +65,14 @@ const NumberInput = ({
                 disabled={disabled}
                 onChange={handleChange}
                 slotProps={{
-                    htmlInput: {
-                        inputMode: "numeric",
-                        pattern: "[0-9]*",
-                    },
+                    htmlInput: decimal
+                        ? {
+                            inputMode: "decimal",
+                        }
+                        : {
+                            inputMode: "numeric",
+                            pattern: "[0-9]*",
+                        },
                 }}
             />
 

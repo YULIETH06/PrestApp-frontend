@@ -106,7 +106,6 @@ export const useLoanSimulator = () => {
         const simulation = calculateLoanSimulation({
             ...form,
             amount: Number(form.amount),
-            interestRate: Number(form.interestRate),
             termValue: Number(form.termValue),
             interestFrequency: form.interestFrequency as LoanFrequency,
             termFrequency: form.termFrequency as LoanFrequency,

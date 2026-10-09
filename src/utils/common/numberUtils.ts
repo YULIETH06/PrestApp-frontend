@@ -3,6 +3,19 @@ export const cleanNumberInput = (value: string) => {
     return value.replace(/\D/g, "");
 };
 
+// Limpia un valor decimal: acepta coma o punto como separador,
+// permite un solo separador y máximo 2 decimales.
+export const cleanDecimalInput = (value: string) => {
+    const normalized = value.replace(/,/g, ".").replace(/[^0-9.]/g, "");
+    const [integerPart = "", ...decimalParts] = normalized.split(".");
+
+    if (decimalParts.length === 0) {
+        return integerPart;
+    }
+
+    return `${integerPart}.${decimalParts.join("").slice(0, 2)}`;
+};
+
 // Formatea un número para mostrarlo con separadores de miles en un input.
 export const formatNumberInput = (value: string | number | "") => {
     if (value === "") return "";
