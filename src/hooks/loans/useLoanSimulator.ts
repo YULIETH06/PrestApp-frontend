@@ -47,6 +47,9 @@ export const useLoanSimulator = () => {
             ...prev,
             [field]: "",
         }));
+
+        // Si cambian los datos, el resultado anterior ya no es válido.
+        setResult(null);
     };
 
     // Convierte el valor ingresado en número cuando el campo no está vacío.
