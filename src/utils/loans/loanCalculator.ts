@@ -52,9 +52,10 @@ export const calculateLoanSimulation = (
     const interestPeriods =
         totalDays / frequencyDays[interestFrequency];
 
-    // Calcula el total de réditos generados.
-    const totalInterest =
-        amount * (interestRate / 100) * interestPeriods;
+    // Calcula el total de réditos generados (en pesos enteros).
+    const totalInterest = Math.round(
+        amount * (interestRate / 100) * interestPeriods
+    );
 
     // Calcula el total a pagar sumando capital e interés.
     const totalToPay = amount + totalInterest;
@@ -64,8 +65,12 @@ export const calculateLoanSimulation = (
     // Calcula la cantidad de cuotas según la frecuencia de pago.
     const installments = Math.ceil(totalDays / paymentDays);
 
-    // Calcula el valor aproximado de cada cuota.
-    const installmentValue = totalToPay / installments;
+    // Calcula el valor de cada cuota en pesos enteros.
+    const installmentValue = Math.round(totalToPay / installments);
+
+    // La última cuota ajusta la diferencia del redondeo.
+    const lastInstallmentValue =
+        totalToPay - installmentValue * (installments - 1);
 
     return {
         amount,
@@ -82,5 +87,6 @@ export const calculateLoanSimulation = (
 
         installments,
         installmentValue,
+        lastInstallmentValue,
     };
 };

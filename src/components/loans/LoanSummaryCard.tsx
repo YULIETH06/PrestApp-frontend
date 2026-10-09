@@ -141,6 +141,12 @@ const LoanSummaryCard = ({ result }: LoanSimulationResultCardProps) => {
                         label="Valor por cuota"
                         value={formatCurrency(result.installmentValue)}
                     />
+                    {result.lastInstallmentValue !== result.installmentValue && (
+                        <ResultRow
+                            label="Última cuota"
+                            value={formatCurrency(result.lastInstallmentValue)}
+                        />
+                    )}
                 </Box>
             </Box>
         </Paper>

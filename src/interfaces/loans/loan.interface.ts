@@ -27,4 +27,5 @@ export interface LoanSimulationResult {
 
     installments: number;
     installmentValue: number;
+    lastInstallmentValue: number;
 }
