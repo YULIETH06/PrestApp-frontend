@@ -134,6 +134,7 @@ const LoanSimulator = () => {
                             <NumberInput
                                 label="% Interés"
                                 required
+                                decimal
                                 value={
                                     form.interestRate
                                 }
@@ -145,13 +146,8 @@ const LoanSimulator = () => {
                                 helperText={
                                     errors.interestRate
                                 }
-                                onChange={(
-                                    value
-                                ) =>
-                                    handleNumberChange(
-                                        "interestRate",
-                                        value
-                                    )
+                                onChange={(value) =>
+                                    handleChange("interestRate", value)
                                 }
                             />
 

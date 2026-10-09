@@ -4,7 +4,7 @@ export type LoanFrequency = "DAILY" | "WEEKLY" | "BIWEEKLY" | "MONTHLY";
 // Datos del formulario para simular un préstamo.
 export interface LoanSimulationForm {
     amount: number | "";
-    interestRate: number | "";
+    interestRate: string;
     interestFrequency: LoanFrequency | "";
     termValue: number | "";
     termFrequency: LoanFrequency | "";
@@ -27,4 +27,5 @@ export interface LoanSimulationResult {
 
     installments: number;
     installmentValue: number;
+    lastInstallmentValue: number;
 }
